@@ -1,4 +1,6 @@
 import express from "express";
+
+import { createWorkout } from "../controllers/workoutController.js";
 const router = express.Router();
 router.get("/", (req, res) => {
   res.json({ message: "Hello World" });
@@ -6,9 +8,7 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   res.json({ message: "Hello World with any id" });
 });
-router.post("/", (req, res) => {
-  res.json({ message: "Hello World with POST" });
-});
+router.post("/", createWorkout);
 router.delete("/:id", (req, res) => {
   res.json({ message: "delete a workout " });
 });

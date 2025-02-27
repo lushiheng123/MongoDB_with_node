@@ -182,3 +182,154 @@ app.get("/", (req, res) => {
 ### 正常 running 代表成功连接了
 
 ![alt text](README_Images/README/image-5.png)
+
+# 5. 创建`models/workoutModel.js`模型
+
+```js
+import mongoose from "mongoose";
+const Schema = mongoose.Schema;
+const workoutSchema = new Schema(
+  {
+    title: {
+      type: String,
+      require: true,
+    },
+    reps: {
+      type: Number,
+      require: true,
+    },
+    load: {
+      type: Number,
+      require: true,
+    },
+  },
+  { timestamps: true }
+);
+const Workout = mongoose.model("Workout", workoutSchema);
+export default Workout;
+```
+
+### 修改`routes/workouts.js`里面的`post`
+
+```js
+import express from "express";
+import Workout from "../models/workoutModel.js";
+const router = express.Router();
+router.get("/", (req, res) => {
+  res.json({ message: "Hello World" });
+});
+router.get("/:id", (req, res) => {
+  res.json({ message: "Hello World with any id" });
+});
+router.post("/", async (req, res) => {
+  const { title, load, reps } = req.body;
+  try {
+    const workout = await Workout.create({ title, load, reps });
+    res.status(200).json(workout);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+router.delete("/:id", (req, res) => {
+  res.json({ message: "delete a workout " });
+});
+router.patch("/:id", (req, res) => {
+  res.json({ message: "update a workout" });
+});
+export default router;
+```
+
+### 效果：用 `post` 传输数据,进入到了`test`中
+
+```json
+{
+  "title": "nihao",
+  "reps": 50,
+  "load": 0
+}
+```
+
+![alt text](README_Images/README/image-7.png)
+![alt text](README_Images/README/image-8.png)
+
+# 6.创建`backend/controllers`迁移到`controller`
+
+### `routes/workouts.js`
+
+```js
+import express from "express";
+
+import { createWorkout } from "../controllers/workoutController.js";
+const router = express.Router();
+router.get("/", (req, res) => {
+  res.json({ message: "Hello World" });
+});
+router.get("/:id", (req, res) => {
+  res.json({ message: "Hello World with any id" });
+});
+router.post("/", createWorkout);
+router.delete("/:id", (req, res) => {
+  res.json({ message: "delete a workout " });
+});
+router.patch("/:id", (req, res) => {
+  res.json({ message: "update a workout" });
+});
+export default router;
+```
+
+### `models/workoutModel.js`
+
+```js
+import mongoose from "mongoose";
+const Schema = mongoose.Schema;
+const workoutSchema = new Schema(
+  {
+    title: {
+      type: String,
+      require: true,
+    },
+    reps: {
+      type: Number,
+      require: true,
+    },
+    load: {
+      type: Number,
+      require: true,
+    },
+  },
+  { timestamps: true }
+);
+const Workout = mongoose.model("Workout", workoutSchema);
+export { Workout };
+```
+
+### `controllers/workoutController.js`
+
+```js
+import { Workout } from "../models/workoutModel.js";
+const createWorkout = async (req, res) => {
+  const { title, load, reps } = req.body;
+  try {
+    const workout = await Workout.create({ title, load, reps });
+    res.status(200).json(workout);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export { createWorkout };
+```
+
+### 可以测试一下
+
+# 7.(可选)将数据库的内容放到空路由上`index.js`
+
+```js
+app.get("/", async (req, res) => {
+  try {
+    const workouts = await Workout.find(); // 查询所有 workouts 数据
+    res.status(200).json(workouts);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+```
