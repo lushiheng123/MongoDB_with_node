@@ -2,8 +2,10 @@ import express from "express";
 
 import {
   createWorkout,
+  deleteWorkout,
   getWorkout,
   getWorkouts,
+  updateWorkout,
 } from "../controllers/workoutController.js";
 const router = express.Router();
 //获取全部workouts
@@ -13,11 +15,9 @@ router.get("/:id", getWorkout);
 //post添加workout
 router.post("/", createWorkout);
 //delete删除workout
-router.delete("/:id", (req, res) => {
-  res.json({ message: "delete a workout " });
-});
+router.delete("/:id", deleteWorkout);
+
 //update更新workout
-router.patch("/:id", (req, res) => {
-  res.json({ message: "update a workout" });
-});
+router.patch("/:id", updateWorkout);
+
 export default router;

@@ -2,13 +2,14 @@ import express from "express";
 import dotenv from "dotenv";
 import workoutsRoutes from "./routes/workouts.js";
 dotenv.config();
+import cors from "cors";
 import mongoose from "mongoose";
 import { Workout } from "./models/workoutModel.js"; // 导入 Workout 模型
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || 5051;
 app.use(express.json());
-
+app.use(cors());
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();

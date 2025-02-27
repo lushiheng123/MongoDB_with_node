@@ -406,3 +406,170 @@ export default router;
 
 ![alt text](README_Images/README/image-10.png)
 ![alt text](README_Images/README/image-11.png)
+
+# 8. 写一个简单的检索报错`backend\controllers\workoutController.js`(部分)
+
+```js
+import mongoose from "mongoose";
+//get a single workout
+const getWorkout = async (req, res) => {
+  const { id } = req.params;
+  // 设置检索报错
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "workout not found" });
+  }
+  const workout = await Workout.findById(id);
+  if (!workout) {
+    return res.status(404).json({ error: "workout not found" });
+  }
+  res.status(200).json(workout);
+};
+```
+
+![alt text](README_Images/README/image-12.png)
+
+# 9. 加上`delete`和`update`方法
+
+### `workoutController.js`
+
+```js
+import { Workout } from "../models/workoutModel.js";
+import mongoose from "mongoose";
+//get all workouts
+const getWorkouts = async (req, res) => {
+  const workouts = await Workout.find({}).sort({ create: -1 });
+  res.status(200).json(workouts);
+};
+
+//get a single workout
+const getWorkout = async (req, res) => {
+  const { id } = req.params;
+  // 设置检索报错
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "workout not found" });
+  }
+  const workout = await Workout.findById(id);
+  if (!workout) {
+    return res.status(404).json({ error: "workout not found" });
+  }
+  res.status(200).json(workout);
+};
+//delete a workout
+const deleteWorkout = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "workout not found" });
+  }
+  const workout = await Workout.findByIdAndDelete({ _id: id });
+  if (!workout) {
+    return res.status(404).json({ error: "workout not found" });
+  }
+  res.status(200).json(workout);
+};
+//update a workout
+const updateWorkout = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "workout not found" });
+  }
+  const workout = await Workout.findOneAndUpdate({ _id: id }, { ...req.body });
+  if (!workout) {
+    return res.status(404).json({ error: "workout not found" });
+  }
+  res.status(200).json(workout);
+};
+//create new workout
+const createWorkout = async (req, res) => {
+  const { title, load, reps } = req.body;
+  try {
+    const workout = await Workout.create({ title, load, reps });
+    res.status(200).json(workout);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export { createWorkout, getWorkout, getWorkouts, updateWorkout, deleteWorkout };
+```
+
+### `routes/workout.js`
+
+```js
+import express from "express";
+
+import {
+  createWorkout,
+  deleteWorkout,
+  getWorkout,
+  getWorkouts,
+  updateWorkout,
+} from "../controllers/workoutController.js";
+const router = express.Router();
+//获取全部workouts
+router.get("/", getWorkouts);
+//获取具体一个workout
+router.get("/:id", getWorkout);
+//post添加workout
+router.post("/", createWorkout);
+//delete删除workout
+router.delete("/:id", deleteWorkout);
+
+//update更新workout
+router.patch("/:id", updateWorkout);
+
+export default router;
+```
+
+### 效果：delete 生效
+
+![alt text](README_Images/README/image-14.png)
+![alt text](README_Images/README/image-13.png)
+
+# 10. 接下来就是搞前端，后端记得安装 cors 允许跨域，前端安装 axios 的 fetch 库
+
+> npm install cors
+> npm install axios
+
+### `App.jsx`
+
+```jsx
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+const Workouts = () => {
+  const [workouts, setWorkouts] = useState([]);
+
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const response = await axios.get("http://localhost:5051/");
+        setWorkouts(response.data);
+      } catch (error) {
+        console.error("Error fetching workouts:", error);
+      }
+    };
+
+    fetchWorkouts();
+  }, []);
+
+  return (
+    <div>
+      <h1>Workouts</h1>
+      <ul>
+        {workouts.map((workout) => (
+          <li key={workout._id}>
+            <h2>{workout.title}</h2>
+            <p>Reps: {workout.reps}</p>
+            <p>Load: {workout.load} kg</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default Workouts;
+```
+
+### 后端`index.js`添加 cors 跨域，效果
+
+![alt text](README_Images/README/image-15.png)
