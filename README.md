@@ -15,7 +15,8 @@ git fetch origin
 git branch -r
 git pull origin basic
 ```
-
+### (官网给的例子，可以看一看)
+[官网示例](https://github.com/mongodb-developer/mern-stack-example)
 # 1. 初始化前后端
 
 ### 前端
