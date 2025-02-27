@@ -1,0 +1,130 @@
+<h1 align="center">mongoose连接数据库</h1>
+
+```sh
+
+git init
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:lushiheng123/MongoDB_with_node.git
+git push -u origin basic
+```
+
+```sh
+git init
+git remote add origin git@github.com:lushiheng123/MongoDB_with_node.git
+git fetch origin
+git branch -r
+git pull origin basic
+```
+
+# 1. 初始化前后端
+
+### 前端
+
+```sh
+npm create vite@ latest ./
+
+```
+
+### 后端
+
+```sh
+npm init
+npm install express nodemon dotenv
+```
+
+### 修改后端 package.json
+
+```json
+"type":"module"
+"server":"nodemon index.js"
+```
+
+```json
+MONGO_URI= mongodb+srv://lushiheng:qweasd521666@database.laxjt.mongodb.net/?retryWrites=true&w=majority&
+BACKEND_PORT = 5051
+```
+
+### 初始化的`index.js`
+
+```js
+import express from "express";
+import dotenv from "dotenv";
+dotenv.config();
+const app = express();
+const PORT = process.env.BACKEND_PORT || 5051;
+app.use(express.json());
+app.get("/", (req, res) => {
+  res.send("你好");
+});
+app.listen(PORT, () => {
+  console.log(`port is running on ${PORT}`);
+});
+```
+
+### 效果：检查后端正常
+
+![alt text](README_Images/README/image.png)
+![alt text](README_Images/README/image-1.png)
+
+# 2. (可选)添加 next 中间组件，显示访问的路由
+
+```js
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
+});
+```
+
+### 当`GET`访问`www.localhost:5051`时候
+
+![alt text](README_Images/README/image-2.png)
+
+# 3. 一次性添加好路由
+
+### `routes/workouts.js`
+
+```js
+import express from "express";
+const router = express.Router();
+router.get("/", (req, res) => {
+  res.json({ message: "Hello World" });
+});
+router.get("/:id", (req, res) => {
+  res.json({ message: "Hello World with any id" });
+});
+router.post("/", (req, res) => {
+  res.json({ message: "Hello World with POST" });
+});
+router.delete("/:id", (req, res) => {
+  res.json({ message: "delete a workout " });
+});
+router.patch("/:id", (req, res) => {
+  res.json({ message: "update a workout" });
+});
+export default router;
+```
+
+### `index.js`
+
+```js
+import express from "express";
+import dotenv from "dotenv";
+import workoutsRoutes from "./routes/workouts.js";
+dotenv.config();
+const app = express();
+const PORT = process.env.BACKEND_PORT || 5051;
+app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
+});
+app.use("/api/workouts", workoutsRoutes);
+app.get("/", (req, res) => {
+  res.send("你好");
+});
+app.listen(PORT, () => {
+  console.log(`port is running on ${PORT}`);
+});
+```
