@@ -333,3 +333,76 @@ app.get("/", async (req, res) => {
   }
 });
 ```
+
+### 可以看见数据库中有哪些
+
+![alt text](README_Images/README/image-9.png)
+
+# 8. 在`backend\controllers\workoutController.js`添加其他功能
+
+```js
+import { Workout } from "../models/workoutModel.js";
+
+//get all workouts
+const getWorkouts = async (req, res) => {
+  const workouts = await Workout.find({}).sort({ create: -1 });
+  res.status(200).json(workouts);
+};
+
+//get a single workout
+const getWorkout = async (req, res) => {
+  const { id } = req.params;
+  const workout = await Workout.findById(id);
+  if (!workout) {
+    return res.status(404).json({ error: "workout not found" });
+  }
+  res.status(200).json(workout);
+};
+//delete a workout
+
+//update a workout
+//create new workout
+const createWorkout = async (req, res) => {
+  const { title, load, reps } = req.body;
+  try {
+    const workout = await Workout.create({ title, load, reps });
+    res.status(200).json(workout);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export { createWorkout, getWorkout, getWorkouts };
+```
+
+### 在 `routes/workouts.js`中添加这些 controller 功能
+
+```js
+import express from "express";
+
+import {
+  createWorkout,
+  getWorkout,
+  getWorkouts,
+} from "../controllers/workoutController.js";
+const router = express.Router();
+//获取全部workouts
+router.get("/", getWorkouts);
+//获取具体一个workout
+router.get("/:id", getWorkout);
+//post添加workout
+router.post("/", createWorkout);
+//delete删除workout
+router.delete("/:id", (req, res) => {
+  res.json({ message: "delete a workout " });
+});
+//update更新workout
+router.patch("/:id", (req, res) => {
+  res.json({ message: "update a workout" });
+});
+export default router;
+```
+
+### 测试：获取全部 workout+根据 ID 检索
+
+![alt text](README_Images/README/image-10.png)
+![alt text](README_Images/README/image-11.png)
