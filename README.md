@@ -3,8 +3,7 @@
 ```sh
 
 git init
-git commit -m "first commit"
-git branch -M main
+git checkout -b basic
 git remote add origin git@github.com:lushiheng123/MongoDB_with_node.git
 git push -u origin basic
 ```
@@ -40,7 +39,7 @@ npm install express nodemon dotenv
 "server":"nodemon index.js"
 ```
 
-```json
+```sh
 MONGO_URI= mongodb+srv://lushiheng:qweasd521666@database.laxjt.mongodb.net/?retryWrites=true&w=majority&
 BACKEND_PORT = 5051
 ```
@@ -128,3 +127,58 @@ app.listen(PORT, () => {
   console.log(`port is running on ${PORT}`);
 });
 ```
+
+### 效果`postman`
+
+![alt text](README_Images/README/image-3.png)
+
+# 4. 在 MongoDB 上添加白名单`0.0.0.0`
+
+![alt text](README_Images/README/image-4.png)
+
+### 后端安装`mongoose`库
+
+```sh
+npm i mongoose
+```
+
+### 测试连接`index.js`
+
+```js
+import express from "express";
+import dotenv from "dotenv";
+import workoutsRoutes from "./routes/workouts.js";
+dotenv.config();
+import mongoose from "mongoose";
+const app = express();
+const PORT = process.env.BACKEND_PORT || 5051;
+app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
+});
+
+// 测试连接
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`port is running on ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+app.use("/api/workouts", workoutsRoutes);
+app.get("/", (req, res) => {
+  res.send("你好");
+});
+// app.listen(PORT, () => {
+//   console.log(`port is running on ${PORT}`);
+// });
+```
+
+### 正常 running 代表成功连接了
+
+![alt text](README_Images/README/image-5.png)
